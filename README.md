@@ -12,6 +12,8 @@ Optimizada para entornos con Hyprland, gaming, multimedia, ciberseguridad y desa
 
 **⚠️ Proyecto en estado BETA: puede contener errores o configuraciones inestables.**
 
+te recomiendo entrar a la versión estable si quieres algo que no te provoque errores pero si quieres probar las últimas actualizaciones entonces juega con esta versión
+
 > 🚀 Enfocado en usuarios avanzados, testers, desarrolladores y entornos de pruebas.
 
 ---
