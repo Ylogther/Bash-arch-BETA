@@ -1,6 +1,6 @@
 # 🎛️ Bash-Arch (BETA) – Scripts para Arch Linux con Hyprland, Gaming, Multimedia y Seguridad
 
-**Versión**: 5.1.3-beta | **Licencia**: MIT
+**Versión**: 6.0.0-beta | **Licencia**: MIT
 
 <p align="left">
   <img src="https://img.shields.io/badge/estado-beta--inestable-yellow" alt="Estado: Beta" />
