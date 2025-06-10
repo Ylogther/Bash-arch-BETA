@@ -15,7 +15,7 @@ Optimizada para entornos con Hyprland, gaming, multimedia, ciberseguridad y desa
 🧭 Elige tu versión
 
 🔹 Versión Estable
-Te recomendamos esta versión si buscas estabilidad, confiabilidad y una experiencia sin errores. Ideal para uso diario o en entornos de trabajo:https.
+Te recomendamos esta versión si buscas estabilidad, confiabilidad y una experiencia sin errores. Ideal para uso diario o en entornos de trabajo.           
 :https://github.com/Ylogther/bash-arch
 
 🔸 Versión Beta/Inestable
