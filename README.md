@@ -4,7 +4,7 @@
 
 <p align="left">
   <img src="https://img.shields.io/badge/estado-beta--inestable-yellow" alt="Estado: Beta" />
-  <img src="https://img.shields.io/github/license/Ylogther/bash-arch?color=blue" alt="Licencia: MIT" />
+  <img src="https://img.shields.io/github/license/Ylogther/bash-arch-BETA?color=blue" alt="Licencia: MIT" />
 </p>
 
 🔧 Herramienta avanzada para automatizar instalaciones, configuraciones y mantenimiento en Arch Linux.
