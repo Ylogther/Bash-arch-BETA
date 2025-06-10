@@ -102,8 +102,6 @@ bash-arch/
 ├── dato_para_juego.txt          # Información o dato técnico relacionado con juegos
 └── subirgithub.sh               # Script para subir automáticamente el proyecto a GitHub
 
- (requisitos)
-└── LICENSE
 ```
 
 ---
