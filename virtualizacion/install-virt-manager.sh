@@ -1,22 +1,39 @@
 #!/bin/bash
 
-#script: install-virt-manager.sh
+# script: install-virt-manager.sh
 
-# Salir si hay errores
-set -e
+set -euo pipefail
 
-echo "[+] Instalando virt-manager y dependencias..."
+YELLOW='\e[33m'
+GREEN='\e[32m'
+RED='\e[31m'
+RESET='\e[0m'
+
+info()  { echo -e "${YELLOW}[INFO] $1${RESET}"; }
+ok()    { echo -e "${GREEN}[OK] $1${RESET}"; }
+warn()  { echo -e "${RED}[WARN] $1${RESET}"; }
+
+info "Instalando virt-manager y dependencias..."
 sudo pacman -Syu --noconfirm virt-manager qemu vde2 dnsmasq bridge-utils openbsd-netcat
 
-echo "[+] Habilitando y arrancando libvirtd..."
+info "Habilitando y arrancando libvirtd..."
 sudo systemctl enable --now libvirtd
 
-echo "[+] Añadiendo usuario actual al grupo libvirt..."
-sudo usermod -aG libvirt "$USER"
+info "Añadiendo usuario '$USER' al grupo libvirt..."
+if groups "$USER" | grep -qw libvirt; then
+    warn "El usuario ya está en el grupo libvirt."
+else
+    sudo usermod -aG libvirt "$USER"
+    ok "Usuario añadido al grupo libvirt."
+fi
 
-echo "[+] Iniciando red NAT default..."
-sudo virsh net-start default || echo "[!] Red ya iniciada"
-sudo virsh net-autostart default
+info "Verificando red NAT 'default'..."
+if sudo virsh net-info default &>/dev/null; then
+    sudo virsh net-start default || warn "La red ya estaba iniciada."
+    sudo virsh net-autostart default
+else
+    warn "La red 'default' no existe. Puedes crearla manualmente si es necesario."
+fi
 
-echo "[+] Instalación completa."
-echo "🔁 Por favor, cierra sesión o reinicia para aplicar el grupo libvirt."
+ok "Instalación y configuración de virt-manager completadas."
+echo -e "${YELLOW}🔁 Cierra sesión o reinicia para aplicar el cambio de grupo.${RESET}"
