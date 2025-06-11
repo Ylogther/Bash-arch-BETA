@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#script: Minecraft-install.sh
+
 set -e
 
 GREEN='\e[32m'
