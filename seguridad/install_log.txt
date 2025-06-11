@@ -1,0 +1,94 @@
+[1;33m[*] Verificando dependencias críticas del sistema...[0m
+[1;33m[*] Verificando conexión a Internet...[0m
+[1;33m[*] Iniciando instalación completa...[0m
+[1;33m[*] Instalando ProtonVPN (GUI) desde Flatpak...[0m
+[1;33m[*] Tamaño aproximado de descarga: ~150 MB[0m
+[1;33m[*] Tamaño aproximado instalado: ~400 MB[0m
+Looking for matches…
+Skipping: com.protonvpn.www/x86_64/stable is already installed
+[1;32m[✓] ProtonVPN instalado correctamente. Puedes ejecutarlo con:[0m
+    flatpak run com.protonvpn.www
+[1;33m[*] Instalando VeraCrypt desde AUR...[0m
+[1;33m[*] Tamaño aproximado de descarga: ~25 MB[0m
+[1;33m[*] Tamaño aproximado instalado: ~70 MB[0m
+Sync Explicit (1): veracrypt-1.26.24-2
+warning: veracrypt-1.26.24-2 is up to date -- reinstalling
+resolving dependencies...
+looking for conflicting packages...
+
+Packages (1) veracrypt-1.26.24-2
+
+Total Installed Size:  4.88 MiB
+Net Upgrade Size:      0.00 MiB
+
+:: Proceed with installation? [Y/n] 
+checking keyring...
+checking package integrity...
+loading package files...
+checking for file conflicts...
+checking available disk space...
+:: Processing package changes...
+reinstalling veracrypt...
+:: Running post-transaction hooks...
+(1/2) Arming ConditionNeedsUpdate...
+(2/2) Updating the desktop file MIME type cache...
+[1;32m[✓] VeraCrypt instalado correctamente.[0m
+
+[1;33mInformación de tamaños aproximados para las categorías BlackArch:[0m
+ - blackarch-networking: descarga ~250 MB / instalado ~600 MB
+ - blackarch-scanner:    descarga ~200 MB / instalado ~500 MB
+ - blackarch-webapp:     descarga ~300 MB / instalado ~700 MB
+
+¿Quieres instalar herramientas útiles de BlackArch (networking, scanner, webapp)? (s/n): [1;33m[*] Omisión de herramientas BlackArch.[0m
+[1;33m[*] Limpiando caché de paquetes AUR...[0m
+Packages to keep:
+  All locally installed packages
+
+Cache directory: /var/cache/pacman/pkg/
+:: Do you want to remove all other packages from cache? [Y/n] error: could not open file /var/cache/pacman/pkg/download-hwfkHY: Error reading fd 7
+
+removing old packages from cache...
+
+Database directory: /var/lib/pacman/
+:: Do you want to remove unused repositories? [Y/n] 
+removing unused sync repositories...
+
+Build directory: /home/ylogther/.cache/yay
+removing AUR packages from cache...
+removing untracked AUR files from cache...
+Removing aurutils-20.5-1-any.pkg.tar.zst
+Removing aurutils-20.5.tar.gz
+Removing bibata-cursor-theme-2.0.7.tar.xz
+Removing bibata-cursor-theme-bin-2.0.7-1-any.pkg.tar.zst
+Removing brave-bin-1.79.119-x86_64.zip
+Removing brave-bin-1:1.79.119-1-x86_64.pkg.tar.zst
+Removing checkupdates-with-aur-1.0-1-any.pkg.tar.zst
+Removing grimblast-git-r129.910dad4-1-any.pkg.tar.zst
+Removing config.toml
+Removing hyprshade-3.2.1-1-any.pkg.tar.zst
+Removing hyprshade-3.2.1.tar.gz
+Removing ml4w-hyprland-2.9.8.6
+Removing ml4w-hyprland-2.9.8.6-1-any.pkg.tar.zst
+Removing caja-open-any-terminal-0.6.0-3-any.pkg.tar.zst
+Removing nautilus-open-any-terminal-0.6.0-3-any.pkg.tar.zst
+Removing nautilus-open-any-terminal-0.6.0.tar.gz
+Removing LICENSE-a5308c4e51268229a039ec4ec9a251a4cdb89d9380383e6e13aeba64a74f19ad
+Removing oh-my-posh-bin-26.4.1-1-x86_64.pkg.tar.zst
+Removing oh-my-posh-bin-debug-26.4.1-1-x86_64.pkg.tar.zst
+Removing posh-linux-amd64-6fb4b3a63e4c8ef800bd678586d86de98d5b436a76d1a8bf198fcac6d5c61e06
+Removing themes-1435551123f315548daa59c26a32a405b5e3f0c36bbedfa8030c1a0f2fab8157.zip
+Removing pacseek-1.8.5-1-any.pkg.tar.zst
+Removing pacseek-1.8.5.tar.gz
+Removing pacseek-debug-1.8.5-1-any.pkg.tar.zst
+Removing Pinta-3.0.1.tar.gz
+Removing pinta-3.0.1-1-any.pkg.tar.zst
+Removing python-screeninfo-0.8.1-2-any.pkg.tar.zst
+Removing python-screeninfo-0.8.1.tar.gz
+Removing waypaper-2.6-1-any.pkg.tar.zst
+Removing waypaper-2.6.tar.gz
+Removing wlogout-1.2.2-0-x86_64.pkg.tar.zst
+Removing wlogout-1.2.2.tar.gz
+Removing wlogout-1.2.2.tar.gz.sig
+Removing wlogout-debug-1.2.2-0-x86_64.pkg.tar.zst
+[1;32m[✓] ✅ Todos los componentes fueron instalados correctamente.[0m
+📄 Revisa el log en: install_log.txt
