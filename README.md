@@ -58,49 +58,50 @@ Perfecta si quieres probar las últimas funciones, mejoras experimentales y camb
 
 ```bash
 bash-arch/
-├── actualizacion/                 # Scripts para actualizar el sistema
-│   └── full_update.sh             # Actualización completa del sistema
-├── desarrollo/                   # Herramientas y setups para desarrollo
-│   ├── README.md                 # Información general sobre scripts de desarrollo
-│   ├── instalar_blackarch.sh     # Instalación del repositorio BlackArch
-│   ├── install_devtools.sh       # Instalación de herramientas de desarrollo (base-devel, etc.)
-│   ├── ml4w_install.sh           # Instalación de ML4W (dotfiles de alto nivel)
-│   └── setup_dev_env.sh          # Configuración completa del entorno de desarrollo
-├── gaming/                      # Scripts para optimizar y preparar el entorno gaming
-│   ├── README.md                 # Información sobre configuraciones y optimizaciones gaming
-│   ├── drivers_install.sh        # Instalación de drivers (NVIDIA, Intel, AMD, etc.)
-│   ├── instalacion-gaming.sh     # Configuraciones adicionales para entorno gaming
-│   └── mas/                      # Extras específicos para gaming
-│       └── Minecraft-install.sh  # Instalación automática y optimizada de Minecraft
-├── icons/                       # Paquetes de iconos personalizados para el sistema
-│   ├── Orbian-Ultradark.zip      # Tema de iconos Orbian Ultradark (ZIP)
-│   └── Vivid-Dark-Icons.tar.gz   # Tema de iconos Vivid Dark (TAR.GZ)
-├── multimedia/                  # Instalación de programas multimedia y streaming
-│   ├── README.md                 # Información general sobre multimedia
-│   ├── davinci_resolve_deps.sh  # Instalación de dependencias para DaVinci Resolve
-│   ├── multimedia_install.sh     # Instalación de herramientas multimedia generales
-│   ├── streaming_install.sh      # Instalación y configuración de OBS y sus plugins
-│   └── solucion abrir davinci resolve/  # Fixes específicos para problemas al abrir DaVinci Resolve
-│       └── d.sh                 # Script de solución directa para errores de arranque
-├── seguridad/                   # Scripts orientados a privacidad, seguridad y red
-│   ├── README.md                         # Información general sobre herramientas de seguridad
-│   ├── cambio_mac.sh                    # Cambio de dirección MAC (aleatoria o manual)
-│   ├── firewall_fail2ban.sh             # Configuración básica de firewall y fail2ban
-│   ├── install_log.txt                  # Registro de instalación o ejecución de herramientas
-│   └── setup_privacy_security_tools.sh  # Instalación de utilidades centradas en privacidad y seguridad
-├── solucion_problema_wifi/      # Scripts y documentación para solucionar problemas de Wi-Fi
-│   ├── README.md                 # Descripción de los problemas conocidos y soluciones aplicadas
-│   └── wifi_watchdog.sh          # Script que reinicia automáticamente el Wi-Fi al detectar desconexión
-├── utilidades/                  # Herramientas y scripts auxiliares generales
-│   └── install_yay.sh            # Instalador automático y limpio de yay (AUR helper)
-├── virtualizacion/              # Scripts para configurar y optimizar entornos de virtualización
-│   ├── README.md                 # Información general sobre configuración de virtualización
-│   └── install-virt-manager.sh   # Instalación y setup de virt-manager y dependencias
-├── LICENSE                       # Licencia del proyecto (GPLv3)
-├── README.md                     # Descripción general del repositorio
-├── aparte_por_si_no_tengo_x11.txt  # Notas o procedimientos alternativos si no hay entorno gráfico
-├── dato_para_juego.txt          # Información o dato técnico relacionado con juegos
-└── subirgithub.sh               # Script para subir automáticamente el proyecto a GitHub
+├── actualizacion/                    # Scripts para mantener Arch actualizado correctamente
+│   └── full_update.sh               # Realiza una actualización completa: sistema + AUR + limpieza
+├── desarrollo/                      # Herramientas esenciales para entornos de desarrollo
+│   ├── README.md                    # Explicación de los scripts de desarrollo
+│   ├── instalar_blackarch.sh        # Añade y sincroniza el repositorio BlackArch para pentesting
+│   ├── install_devtools.sh          # Instala base-devel y herramientas de desarrollo estándar
+│   ├── ml4w_install.sh              # Instala dotfiles avanzados "MyLinuxForWork" para Hyprland
+│   └── setup_dev_env.sh             # Automatiza configuración de entorno dev general (git, zsh, etc.)
+├── gaming/                          # Scripts para optimizar el sistema para juegos
+│   ├── README.md                    # Detalles sobre configuraciones gaming incluidas
+│   ├── drivers_install.sh           # Instala automáticamente drivers NVIDIA, AMD o Intel según hardware
+│   ├── instalacion-gaming.sh        # Aplica ajustes y paquetes extra para gaming (gamemode, mangohud, etc.)
+│   └── mas/                         # Scripts adicionales específicos para juegos
+│       └── Minecraft-install.sh     # Instala el launcher oficial de Minecraft desde el AUR
+├── icons/                           # Temas de iconos listos para ser instalados
+│   ├── Orbian-Ultradark.zip         # Tema para mouse
+│   └── Vivid-Dark-Icons.tar.gz      # Tema para iconos
+├── multimedia/                      # Setup para edición de video, OBS y multimedia en general
+│   ├── README.md                    # Información general de esta sección
+│   ├── davinci_resolve_deps.sh     # Instala las dependencias que requiere DaVinci Resolve en Arch
+│   ├── multimedia_install.sh        # Instala paquetes de edición, audio y video (Kdenlive, Audacity, etc.)
+│   ├── streaming_install.sh         # Instala OBS Studio y plugins útiles para streamers
+│   └── solucion abrir davinci resolve/
+│       └── d.sh                     # Fix específico para errores comunes al lanzar DaVinci
+├── seguridad/                       # Scripts de privacidad, seguridad y protección de red
+│   ├── README.md                    # Detalla herramientas y scripts de esta categoría
+│   ├── cambio_mac.sh                # Cambia la dirección MAC aleatoriamente o manualmente
+│   ├── firewall_fail2ban.sh         # Configura un firewall simple y activa fail2ban
+│   ├── install_log.txt              # Registro de instalaciones hechas (útil para auditoría)
+│   └── setup_privacy_security_tools.sh  # Instala herramientas como Tor, ufw, dnscrypt, etc.
+├── solucion_problema_wifi/          # Diagnóstico y solución a desconexiones Wi-Fi en Arch
+│   ├── README.md                    # Explicación del enfoque de solución
+│   └── wifi_watchdog.sh             # Script watchdog: reinicia Wi-Fi si detecta caída de red
+├── utilidades/                      # Scripts que no encajan en una categoría específica
+│   └── install_yay.sh               # Instala yay desde el AUR de forma segura y limpia
+├── virtualizacion/                  # Herramientas para virtualización con virt-manager y QEMU
+│   ├── README.md                    # Detalla cómo usar los scripts de esta carpeta
+│   └── install-virt-manager.sh      # Instala virt-manager, QEMU y configura libvirtd correctamente
+├── LICENSE                          # Licencia GPLv3 para todo el proyecto
+├── README.md                        # Introducción, instrucciones y diagrama del repositorio
+├── aparte_por_si_no_tengo_x11.txt  # Notas 
+├── dato_para_juego.txt             # Dato técnico para ver rendimiento de un juego
+└── subirgithub.sh                  # Script para hacer push automático del proyecto a GitHub
+
 
 ```
 
