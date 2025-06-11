@@ -1,33 +1,49 @@
 #!/bin/bash
 
-#script: firewall_fail2ban.sh
+# script: firewall_fail2ban.sh
 
-set -e
+set -euo pipefail
 
-echo "🚧 Instalando y configurando firewall y fail2ban..."
+echo "🚧 Instalando y configurando firewall + Fail2Ban..."
 
-# Instalar firewall (ufw) y fail2ban
-if command -v pacman &> /dev/null; then
-    sudo pacman -S --noconfirm ufw fail2ban
-elif command -v apt &> /dev/null; then
-    sudo apt install -y ufw fail2ban
+# === Detectar distribución y gestor de paquetes ===
+if command -v pacman &>/dev/null; then
+    PM_INSTALL="sudo pacman -S --noconfirm"
+elif command -v apt &>/dev/null; then
+    sudo apt update
+    PM_INSTALL="sudo apt install -y"
 else
-    echo "⚠️ No se detectó gestor de paquetes compatible para instalar ufw y fail2ban."
+    echo "⚠️ No se detectó gestor de paquetes compatible (pacman o apt)."
     exit 1
 fi
 
-# Activar y habilitar ufw
-sudo systemctl enable ufw --now
+# === Instalar UFW y Fail2Ban ===
+echo "📦 Instalando ufw y fail2ban..."
+$PM_INSTALL ufw fail2ban
+
+# === Configurar UFW ===
+echo "🧱 Configurando reglas de firewall..."
+sudo systemctl enable --now ufw
+
+sudo ufw --force reset
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow ssh
-sudo ufw enable
 
-echo "✔ Firewall UFW configurado y habilitado."
+if ! sudo ufw enable; then
+    echo "❌ Error al habilitar UFW"
+    exit 1
+fi
 
-# Configurar fail2ban con reglas básicas
-sudo systemctl enable fail2ban --now
+echo "✔ Firewall UFW habilitado con configuración básica segura."
 
-echo "✔ Fail2ban habilitado y en ejecución."
+# === Activar Fail2Ban ===
+echo "🔒 Activando fail2ban..."
+sudo systemctl enable --now fail2ban
 
-echo "🔒 Configuración de seguridad básica completada."
+# === Verificación final ===
+echo "📋 Estado de los servicios:"
+echo " 🔹 UFW: $(sudo ufw status | grep Status)"
+echo " 🔹 Fail2Ban: $(systemctl is-active fail2ban)"
+
+echo "✅ Seguridad básica activa (UFW + Fail2Ban)."
