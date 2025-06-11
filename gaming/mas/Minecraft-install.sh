@@ -1,50 +1,59 @@
 #!/bin/bash
 
-#script: Minecraft-install.sh
+# script: Minecraft-install.sh
 
-set -e
+set -euo pipefail
 
 GREEN='\e[32m'
 RED='\e[31m'
 YELLOW='\e[33m'
 RESET='\e[0m'
 
-echo -e "${YELLOW}==> Instalando Minecraft Launcher oficial (moderno) desde el AUR${RESET}"
+info()  { echo -e "${YELLOW}[INFO] $1${RESET}"; }
+ok()    { echo -e "${GREEN}[OK] $1${RESET}"; }
+error() { echo -e "${RED}[ERROR] $1${RESET}"; }
 
-# Verifica que estás en Arch
-if ! command -v pacman &> /dev/null; then
-    echo -e "${RED}Error: este script solo funciona en Arch Linux o derivados.${RESET}"
+info "Instalando Minecraft Launcher oficial desde el AUR..."
+
+# Verifica sistema Arch
+if ! command -v pacman &>/dev/null; then
+    error "Este script solo funciona en Arch Linux o derivados."
     exit 1
 fi
 
-# Verificar que git esté instalado
-if ! command -v git &> /dev/null; then
-    echo -e "${YELLOW}Git no está instalado. Instalando...${RESET}"
+# Verifica git
+if ! command -v git &>/dev/null; then
+    info "Git no encontrado. Instalando..."
     sudo pacman -S --noconfirm git
 fi
 
-# Verificar que base-devel esté instalado
-if ! pacman -Qq base-devel &> /dev/null; then
-    echo -e "${YELLOW}Instalando base-devel (necesario para compilar desde el AUR)...${RESET}"
+# Verifica base-devel
+if ! pacman -Qq base-devel &>/dev/null; then
+    info "Instalando grupo base-devel..."
     sudo pacman -S --noconfirm base-devel
 fi
 
-# Crear carpeta temporal
+# Clonar AUR en temp
 TMPDIR=$(mktemp -d)
-echo -e "${YELLOW}Clonando repositorio AUR en $TMPDIR${RESET}"
+info "Clonando AUR en: $TMPDIR"
 cd "$TMPDIR"
 
-# Clonar el launcher oficial desde el AUR
-git clone https://aur.archlinux.org/minecraft-launcher.git
+git clone https://aur.archlinux.org/minecraft-launcher.git || {
+    error "Fallo al clonar el repositorio AUR."
+    exit 1
+}
+
 cd minecraft-launcher
 
-# Compilar e instalar
-echo -e "${YELLOW}Compilando e instalando el launcher...${RESET}"
-makepkg -si --noconfirm
+info "Compilando e instalando el launcher..."
+makepkg -si --noconfirm || {
+    error "Error al compilar el paquete."
+    exit 1
+}
 
 # Limpieza
 cd ~
 rm -rf "$TMPDIR"
 
-echo -e "${GREEN}Minecraft Launcher oficial (moderno) instalado correctamente.${RESET}"
-echo -e "${YELLOW}Puedes ejecutarlo buscando 'Minecraft Launcher' en tu menú o usando:${RESET} minecraft-launcher"
+ok "Minecraft Launcher oficial instalado correctamente."
+info "Ejecuta con: minecraft-launcher"
