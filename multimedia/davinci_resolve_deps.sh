@@ -1,6 +1,8 @@
 #!/bin/bash
 
-#script: davinci_resolve_deps.sh
+# script: davinci_resolve_deps.sh
+
+set -euo pipefail
 
 # ==== Colores ====
 GREEN='\e[32m'
@@ -9,48 +11,60 @@ YELLOW='\e[33m'
 BLUE='\e[34m'
 RESET='\e[0m'
 
-titulo() {
-    echo -e "\n${YELLOW}===> $1${RESET}"
-}
-
-error() {
-    echo -e "${RED}✖ $1${RESET}"
-    exit 1
-}
+titulo() { echo -e "\n${YELLOW}===> $1${RESET}"; }
+info()   { echo -e "${BLUE}ℹ $1${RESET}"; }
+error()  { echo -e "${RED}✖ $1${RESET}"; exit 1; }
 
 # ==== Comprobación de root ====
-if [[ $EUID -ne 0 ]]; then
-    error "Este script debe ejecutarse como root (usa sudo)"
-fi
+[[ $EUID -ne 0 ]] && error "Este script debe ejecutarse como root (usa sudo)"
 
 titulo "🎬 Instalación de dependencias para DaVinci Resolve en Arch Linux"
 
-# 1. Dependencias base
+# ==== Detección automática de GPU ====
+HAS_NVIDIA=$(lspci | grep -qi "NVIDIA" && echo 1 || echo 0)
+HAS_INTEL=$(lspci | grep -qi "Intel.*Graphics" && echo 1 || echo 0)
+
+# ==== 1. Dependencias base ====
 titulo "📦 Instalando dependencias esenciales..."
 pacman -S --noconfirm libxcrypt-compat ocl-icd || error "Error instalando dependencias base"
 
-# 2. NVIDIA GPU
-titulo "🟢 Instalando soporte para NVIDIA..."
-pacman -S --noconfirm nvidia nvidia-utils opencl-nvidia || error "Error instalando soporte NVIDIA"
+# ==== 2. NVIDIA ====
+if [[ $HAS_NVIDIA -eq 1 ]]; then
+    titulo "🟢 Instalando soporte para NVIDIA propietario"
+    pacman -S --noconfirm nvidia nvidia-utils opencl-nvidia || error "Error con soporte NVIDIA"
+    if lsmod | grep -q nouveau; then
+        error "El módulo 'nouveau' está cargado. Debes desactivarlo para usar los drivers propietarios."
+    fi
+else
+    info "No se detectó GPU NVIDIA. Saltando soporte propietario."
+fi
 
-# 3. Intel GPU (opcional)
-titulo "🔵 Instalando soporte para Intel (opcional)..."
-pacman -S --noconfirm intel-media-driver intel-compute-runtime opencl-intel || echo -e "${BLUE}Intel no es obligatorio. Puedes omitirlo si no usas iGPU.${RESET}"
+# ==== 3. Intel (opcional) ====
+if [[ $HAS_INTEL -eq 1 ]]; then
+    titulo "🔵 Instalando soporte para Intel iGPU"
+    pacman -S --noconfirm intel-media-driver intel-compute-runtime opencl-intel || \
+        info "Fallo en drivers Intel, pero no son obligatorios si no usas iGPU"
+else
+    info "No se detectó GPU Intel. Saltando."
+fi
 
-# 4. Activar systemd-resolved y configurar resolv.conf
-titulo "🔧 Configurando systemd-resolved..."
+# ==== 4. Activar systemd-resolved ====
+titulo "🔧 Configurando systemd-resolved"
 systemctl enable --now systemd-resolved || error "No se pudo habilitar systemd-resolved"
 ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf || error "No se pudo configurar /etc/resolv.conf"
 
-# 5. Verificar clinfo
-titulo "🧪 Verificando disponibilidad de OpenCL y GPU..."
-if ! command -v clinfo &> /dev/null; then
-    echo -e "${YELLOW}Instalando clinfo...${RESET}"
-    pacman -S --noconfirm clinfo || error "Error instalando clinfo"
+# ==== 5. clinfo ====
+titulo "🧪 Verificando disponibilidad de OpenCL y GPU"
+if ! command -v clinfo &>/dev/null; then
+    info "Instalando clinfo..."
+    pacman -S --noconfirm clinfo || error "Error instalando clinfo"
 fi
 
-echo -e "${BLUE}📋 Resultado de clinfo:${RESET}"
-clinfo | grep -E "Device|Platform Name|Vendor"
+info "📋 Resumen de clinfo:"
+if ! clinfo | grep -q "Device"; then
+    error "clinfo no detecta dispositivos OpenCL. Verifica tus drivers."
+else
+    clinfo | grep -E "Device|Platform Name|Vendor"
+fi
 
-titulo "✅ Configuración completa. Ahora puedes ejecutar el instalador .run de DaVinci Resolve"
-
+titulo "✅ Configuración completa. Ejecuta ahora el instalador .run de DaVinci Resolve"
