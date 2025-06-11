@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#script: install_yay.sh
+# script: install_yay.sh
 
 set -e
 
@@ -9,9 +9,9 @@ RED='\e[31m'
 YELLOW='\e[33m'
 RESET='\e[0m'
 
-echo -e "${YELLOW}==> Instalando yay (AUR helper)${RESET}"
+echo -e "${YELLOW}==> Instalando yay (AUR helper)...${RESET}"
 
-# Verificar que pacman y git estén instalados
+# Verificar que pacman y git estén disponibles
 if ! command -v pacman &> /dev/null; then
     echo -e "${RED}Error: pacman no encontrado. Este script es solo para Arch Linux.${RESET}"
     exit 1
@@ -22,31 +22,28 @@ if ! command -v git &> /dev/null; then
     sudo pacman -S --noconfirm git
 fi
 
-# Instalar base-devel si no está instalado (requisito para compilar paquetes AUR)
-if ! pacman -Qq base-devel &> /dev/null; then
-    echo -e "${YELLOW}Instalando grupo base-devel...${RESET}"
-    sudo pacman -S --noconfirm base-devel
+# Verificar instalación de base-devel (paquete esencial para makepkg)
+missing_pkgs=()
+for pkg in binutils fakeroot gcc make pkgconf; do
+    pacman -Q $pkg &>/dev/null || missing_pkgs+=("$pkg")
+done
+
+if [[ ${#missing_pkgs[@]} -gt 0 ]]; then
+    echo -e "${YELLOW}Instalando paquetes base-devel faltantes: ${missing_pkgs[*]}...${RESET}"
+    sudo pacman -S --noconfirm "${missing_pkgs[@]}"
 fi
 
-# Crear carpeta temporal para la compilación
+# Crear directorio temporal
 TMPDIR=$(mktemp -d)
-echo -e "${YELLOW}Creando carpeta temporal en $TMPDIR${RESET}"
+trap 'rm -rf "$TMPDIR"' EXIT
 
+echo -e "${YELLOW}Clonando yay en $TMPDIR...${RESET}"
 cd "$TMPDIR"
-
-# Clonar repositorio de yay
-echo -e "${YELLOW}Clonando yay desde AUR...${RESET}"
 git clone https://aur.archlinux.org/yay.git
-
 cd yay
 
-# Construir e instalar yay
 echo -e "${YELLOW}Compilando e instalando yay...${RESET}"
 makepkg -si --noconfirm
 
-# Volver y limpiar
-cd ..
-rm -rf "$TMPDIR"
-
-echo -e "${GREEN}yay instalado correctamente.${RESET}"
+echo -e "${GREEN}✓ yay instalado correctamente.${RESET}"
 
