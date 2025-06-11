@@ -1,146 +1,86 @@
 #!/bin/bash
 
-#script: instalacion-gaming.sh
+# script: instalacion-gaming.sh
 
-# Colores
+set -euo pipefail
+
+# === Colores ===
 GREEN='\e[32m'
 RED='\e[31m'
 YELLOW='\e[33m'
 RESET='\e[0m'
 
-# Función para mostrar título
-titulo() {
-    echo -e "\n${YELLOW}=== $1 ===${RESET}"
-}
+titulo() { echo -e "\n${YELLOW}=== $1 ===${RESET}"; }
+error()  { echo -e "${RED}✖ $1${RESET}"; exit 1; }
 
-# Verificar si se está ejecutando como root
-if [[ $EUID -ne 0 ]]; then
-    echo -e "${RED}Este script debe ejecutarse como root. Usa 'sudo ./nombre.sh'${RESET}"
-    exit 1
-fi
+# === Verificación de permisos ===
+[[ $EUID -ne 0 ]] && error "Este script debe ejecutarse como root. Usa 'sudo ./nombre.sh'"
 
-# Verificar y activar repo multilib en /etc/pacman.conf
-titulo "Verificando repositorio multilib en /etc/pacman.conf"
-
+# === Activar [multilib] ===
 PACMAN_CONF="/etc/pacman.conf"
+titulo "Verificando repositorio multilib en $PACMAN_CONF"
 
 if grep -q "^\s*#\s*\[multilib\]" "$PACMAN_CONF"; then
-    echo "Repositorio [multilib] está comentado, intentando activarlo..."
-
-    if sed -i '/^\s*#\s*\[multilib\]/s/^\s*#\s*//' "$PACMAN_CONF" && \
-       sed -i '/^\s*#\s*Include = \/etc\/pacman.d\/mirrorlist/s/^\s*#\s*//' "$PACMAN_CONF"; then
-        echo -e "${GREEN}[multilib] activado correctamente.${RESET}"
-        echo "Actualizando la base de datos de paquetes..."
-        pacman -Sy --noconfirm
-    else
-        echo -e "${RED}No se pudo modificar /etc/pacman.conf. Ejecuta el script con permisos adecuados.${RESET}"
-        exit 1
-    fi
+    echo "Repositorio [multilib] está comentado. Activando..."
+    sed -i '/^\s*#\s*\[multilib\]/s/^#//' "$PACMAN_CONF"
+    sed -i '/^\s*#\s*Include = \/etc\/pacman.d\/mirrorlist/s/^#//' "$PACMAN_CONF"
+    echo -e "${GREEN}[multilib] activado.${RESET}"
+    pacman -Sy --noconfirm
 elif grep -q "^\s*\[multilib\]" "$PACMAN_CONF"; then
-    echo -e "${GREEN}[multilib] ya está activado.${RESET}"
+    echo -e "${GREEN}[multilib] ya está activado.${RESET}"
 else
-    echo -e "${RED}Repositorio [multilib] no encontrado en /etc/pacman.conf.${RESET}"
+    error "Repositorio [multilib] no encontrado."
 fi
 
-# Actualizar sistema
-titulo "ACTUALIZANDO EL SISTEMA"
-pacman -Syu --noconfirm || { echo -e "${RED}Error actualizando el sistema.${RESET}"; exit 1; }
+# === Actualizar sistema ===
+titulo "Actualizando el sistema"
+pacman -Syu --noconfirm || error "Fallo al actualizar"
 
-# Detectar hardware GPU
-titulo "Detectando hardware GPU..."
+# === Detección de GPU ===
+titulo "Detectando GPU..."
+lspci | grep -Ei 'vga|3d|display' || echo -e "${YELLOW}No se detectó GPU.${RESET}"
 
-HAS_NVIDIA=0
-HAS_INTEL=0
-HAS_AMD=0
+HAS_NVIDIA=$(lspci | grep -qi 'NVIDIA' && echo 1 || echo 0)
+HAS_INTEL=$(lspci | grep -Eqi 'Intel.*(UHD|HD Graphics)' && echo 1 || echo 0)
+HAS_AMD=$(lspci | grep -Eqi 'AMD|ATI|Radeon' && echo 1 || echo 0)
 
-# Detectar NVIDIA
-if lspci | grep -i "NVIDIA" &> /dev/null; then
-    HAS_NVIDIA=1
-fi
+echo -e "NVIDIA: $HAS_NVIDIA\nIntel: $HAS_INTEL\nAMD: $HAS_AMD"
 
-# Detectar Intel
-if lspci | grep -i "Intel Corporation UHD" &> /dev/null || lspci | grep -i "Intel Corporation HD Graphics" &> /dev/null; then
-    HAS_INTEL=1
-fi
+# === Drivers ===
+[[ $HAS_INTEL -eq 1 ]] && titulo "Instalando drivers Intel" && \
+pacman -S --noconfirm mesa libva-intel-driver libva-utils vulkan-intel vulkan-tools
 
-# Detectar AMD
-if lspci | grep -i "AMD/ATI" &> /dev/null || lspci | grep -i "Radeon" &> /dev/null; then
-    HAS_AMD=1
-fi
+[[ $HAS_AMD -eq 1 ]] && titulo "Instalando drivers AMD" && \
+pacman -S --noconfirm mesa xf86-video-amdgpu vulkan-radeon vulkan-tools
 
-echo "Detección:"
-echo "NVIDIA: $HAS_NVIDIA"
-echo "Intel: $HAS_INTEL"
-echo "AMD: $HAS_AMD"
-
-# Instalar drivers según hardware detectado
-
-# Intel drivers
-if [[ $HAS_INTEL -eq 1 ]]; then
-    titulo "Instalando drivers Intel + Vulkan"
-    pacman -S --noconfirm mesa libva-intel-driver libva-utils vulkan-intel vulkan-icd-loader vulkan-tools || {
-        echo -e "${RED}Error instalando drivers Intel.${RESET}"; exit 1;
-    }
-fi
-
-# AMD drivers
-if [[ $HAS_AMD -eq 1 ]]; then
-    titulo "Instalando drivers AMD + Vulkan"
-    pacman -S --noconfirm mesa xf86-video-amdgpu vulkan-radeon vulkan-icd-loader vulkan-tools || {
-        echo -e "${RED}Error instalando drivers AMD.${RESET}"; exit 1;
-    }
-fi
-
-# NVIDIA drivers
 if [[ $HAS_NVIDIA -eq 1 ]]; then
-    titulo "Instalando drivers NVIDIA propietarios"
-    pacman -S --noconfirm nvidia nvidia-utils nvidia-settings nvidia-prime || {
-        echo -e "${RED}Error instalando drivers NVIDIA.${RESET}"; exit 1;
-    }
-    systemctl enable nvidia-persistenced.service
-    systemctl start nvidia-persistenced.service
+    titulo "Instalando drivers NVIDIA propietarios"
+    pacman -S --noconfirm nvidia nvidia-utils nvidia-settings nvidia-prime
+    systemctl enable --now nvidia-persistenced.service || true
 fi
 
-if [[ $HAS_NVIDIA -eq 0 && $HAS_INTEL -eq 0 && $HAS_AMD -eq 0 ]]; then
-    echo -e "${YELLOW}No se detectó GPU compatible para instalar drivers gráficos específicos.${RESET}"
-fi
+# === Wine + Steam + Lutris ===
+titulo "Instalando Wine, Steam y Lutris"
+pacman -S --noconfirm wine winetricks steam steam-native-runtime lutris
 
-# Wine y herramientas
-titulo "INSTALANDO WINE Y WINETRICKS"
-pacman -S --noconfirm wine winetricks || { echo -e "${RED}Error instalando Wine.${RESET}"; exit 1; }
+# === Flatpak y apps ===
+titulo "Instalando Flatpak + Heroic Games Launcher"
+pacman -S --noconfirm flatpak
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install -y --noninteractive flathub com.heroicgameslauncher.hgl
+flatpak install -y --noninteractive flathub net.davidotek.pupgui2  # ProtonUp-QT
 
-# Steam
-titulo "INSTALANDO STEAM"
-pacman -S --noconfirm steam steam-native-runtime || { echo -e "${RED}Error instalando Steam.${RESET}"; exit 1; }
+# === MangoHUD, GOverlay, GameMode ===
+titulo "Instalando herramientas de monitoreo y optimización"
+pacman -S --noconfirm mangohud goverlay gamemode
 
-# Lutris
-titulo "INSTALANDO LUTRIS"
-pacman -S --noconfirm lutris || { echo -e "${RED}Error instalando Lutris.${RESET}"; exit 1; }
+# === PipeWire ===
+titulo "Instalando servidor de audio PipeWire"
+pacman -S --noconfirm pipewire pipewire-audio pipewire-alsa pipewire-pulse wireplumber
 
-# Flatpak + Heroic
-titulo "INSTALANDO FLATPAK Y HEROIC GAMES LAUNCHER"
-pacman -S --noconfirm flatpak || { echo -e "${RED}Error instalando Flatpak.${RESET}"; exit 1; }
-flatpak install -y flathub com.heroicgameslauncher.hgl || { echo -e "${RED}Error instalando Heroic Games Launcher.${RESET}"; exit 1; }
+# === Gamepad support ===
+titulo "Instalando soporte para mandos de juego"
+pacman -S --noconfirm game-devices-udev
 
-# ProtonUp-QT
-titulo "INSTALANDO PROTONUP-QT"
-flatpak install -y flathub net.davidotek.pupgui2 || { echo -e "${RED}Error instalando ProtonUp-QT.${RESET}"; exit 1; }
-
-# MangoHUD y GOverlay
-titulo "INSTALANDO MANGOHUD Y GOVERLAY"
-pacman -S --noconfirm mangohud goverlay || { echo -e "${RED}Error instalando MangoHUD o GOverlay.${RESET}"; exit 1; }
-
-# GameMode
-titulo "INSTALANDO GAMEMODE"
-pacman -S --noconfirm gamemode || { echo -e "${RED}Error instalando GameMode.${RESET}"; exit 1; }
-
-# Audio con PipeWire
-titulo "INSTALANDO PIPEWIRE"
-pacman -S --noconfirm pipewire pipewire-audio pipewire-alsa pipewire-pulse wireplumber || { echo -e "${RED}Error instalando PipeWire.${RESET}"; exit 1; }
-
-# Soporte gamepads
-titulo "INSTALANDO SOPORTE PARA GAMEPADS"
-pacman -S --noconfirm game-devices-udev || { echo -e "${RED}Error instalando soporte para gamepads.${RESET}"; exit 1; }
-
-# Final
-titulo "TODO COMPLETO. REINICIA TU SISTEMA PARA APLICAR LOS CAMBIOS."
+titulo "🎮 Entorno gaming completo instalado"
+echo -e "${GREEN}🔁 Reinicia tu sistema para aplicar todos los cambios.${RESET}"
