@@ -1,31 +1,53 @@
 #!/bin/bash
+# script: instalar_blackarch.sh
+# Instalación segura del repositorio BlackArch desde carpeta temporal
 
-#script: instalar_blackarch.sh
+set -euo pipefail
 
-# Script para instalar el repositorio de BlackArch desde una carpeta temporal
+# --- Configuración ---
+STRAP_URL="https://blackarch.org/strap.sh"
+STRAP_FILE="strap.sh"
 
-# Paso 1: Crear carpeta temporal
+# Crear carpeta temporal y asegurar limpieza
 TEMP_DIR=$(mktemp -d)
+cleanup() {
+    echo "[*] Limpiando carpeta temporal: $TEMP_DIR"
+    rm -rf "$TEMP_DIR"
+}
+trap cleanup EXIT
+
 echo "[*] Carpeta temporal creada en: $TEMP_DIR"
-cd "$TEMP_DIR" || { echo "[-] Error al entrar en $TEMP_DIR"; exit 1; }
+cd "$TEMP_DIR"
 
-# Paso 2: Descargar strap.sh
-echo "[*] Descargando strap.sh desde blackarch.org..."
-curl -O https://blackarch.org/strap.sh || { echo "[-] Error al descargar strap.sh"; exit 1; }
+# --- Descargar strap.sh ---
+echo "[*] Descargando strap.sh desde ${STRAP_URL}..."
+curl -fsSLO "$STRAP_URL"
 
-# Paso 3: Dar permisos de ejecución
-chmod +x strap.sh
+# --- Verificar hash (opcional pero recomendado) ---
+echo "[*] Verificando integridad de strap.sh..."
+EXPECTED_HASH=$(curl -fsSL https://blackarch.org/strap.sh.sha1 | awk '{print $1}')
+DOWNLOADED_HASH=$(sha1sum "$STRAP_FILE" | awk '{print $1}')
 
-# Paso 4: Ejecutar el script con sudo
-echo "[*] Ejecutando strap.sh..."
-sudo ./strap.sh || { echo "[-] Error al ejecutar strap.sh"; exit 1; }
+if [[ "$EXPECTED_HASH" != "$DOWNLOADED_HASH" ]]; then
+    echo "[-] Error: La verificación de integridad falló. Hash inválido."
+    exit 1
+fi
+echo "[✓] Integridad verificada."
 
-# Paso 5: Sincronizar base de datos de paquetes
-echo "[*] Actualizando la base de datos de pacman..."
+# --- Ejecutar script ---
+chmod +x "$STRAP_FILE"
+echo "[*] Ejecutando strap.sh como root..."
+sudo "./$STRAP_FILE"
+
+# --- Actualizar base de datos de paquetes ---
+echo "[*] Sincronizando base de datos de pacman..."
 sudo pacman -Sy
 
-echo "[✓] BlackArch instalado correctamente desde carpeta temporal."
+# --- Mensaje final ---
+echo "[✓] BlackArch se instaló correctamente."
 
-# Mensaje final
-echo "Puedes listar herramientas con: pacman -Sgg | grep blackarch"
-echo "Puedes eliminar la carpeta temporal con: rm -rf $TEMP_DIR"
+echo -e "\n📦 Puedes listar herramientas disponibles con:"
+echo "    pacman -Sgg | grep blackarch"
+
+echo -e "\n🧹 Carpeta temporal eliminada automáticamente al salir."
+
