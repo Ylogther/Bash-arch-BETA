@@ -5,6 +5,8 @@
 <p align="left">
   <img src="https://img.shields.io/badge/estado-beta--inestable-yellow" alt="Estado: Beta" />
   <img src="https://img.shields.io/github/license/Ylogther/bash-arch-BETA?color=blue" alt="Licencia: MIT" />
+
+  ![Arch Linux](https://img.shields.io/badge/compatibilidad-ArchLinux-%236C6C6C?logo=arch-linux&logoColor=white)
 </p>
 
 🔧 Herramienta avanzada para automatizar instalaciones, configuraciones y mantenimiento en Arch Linux.
