@@ -1,12 +1,10 @@
 # 🎛️ Bash-Arch (BETA) – Scripts para Arch Linux con Hyprland, Gaming, Multimedia y Seguridad
 
-**Versión**: 6.0.0-beta | **Licencia**: MIT
+**Versión**: 6.0.1-beta | **Licencia**: MIT
 
 <p align="left">
   <img src="https://img.shields.io/badge/estado-beta--inestable-yellow" alt="Estado: Beta" />
   <img src="https://img.shields.io/github/license/Ylogther/bash-arch-BETA?color=blue" alt="Licencia: MIT" />
-
-  ![Arch Linux](https://img.shields.io/badge/compatibilidad-ArchLinux-%236C6C6C?logo=arch-linux&logoColor=white)
 </p>
 
 🔧 Herramienta avanzada para automatizar instalaciones, configuraciones y mantenimiento en Arch Linux.
@@ -95,6 +93,9 @@ bash-arch/
 │   └── wifi_watchdog.sh             # Script watchdog: reinicia Wi-Fi si detecta caída de red
 ├── utilidades/                      # Scripts que no encajan en una categoría específica
 │   └── install_yay.sh               # Instala yay desde el AUR de forma segura y limpia
+├── Mis-keybindings/                 # carpeta personal de keybindings que uso
+│   ├── default.conf                 # keybindings que uso
+│   └── fr.conf                      # adicional
 ├── virtualizacion/                  # Herramientas para virtualización con virt-manager y QEMU
 │   ├── README.md                    # Detalla cómo usar los scripts de esta carpeta
 │   └── install-virt-manager.sh      # Instala virt-manager, QEMU y configura libvirtd correctamente

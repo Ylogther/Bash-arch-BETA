@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# script: Minecraft-install.sh
+# script-beta: Minecraft-install.sh
 
 set -euo pipefail
 
@@ -56,4 +56,4 @@ cd ~
 rm -rf "$TMPDIR"
 
 ok "Minecraft Launcher oficial instalado correctamente."
-info "Ejecuta con: minecraft-launcher"
+info "Ejecuta con:${GREEN} minecraft-launcher"
